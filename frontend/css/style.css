@@ -1,0 +1,138 @@
+/* Basic Reset & Fonts */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background-color: #f5f7fa;
+  color: #333;
+}
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+.auth-card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  max-width: 400px;
+  width: 100%;
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  flex: 1;
+  padding: 0.5rem 0;
+  background: #e9ecef;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.tab.active {
+  background: #0d9488;
+  color: #fff;
+  border-radius: 8px 8px 0 0;
+}
+
+.form {
+  display: none;
+  flex-direction: column;
+}
+
+.form.active {
+  display: flex;
+}
+
+.form h2 {
+  margin-bottom: 1rem;
+  color: #0f172a;
+  text-align: center;
+}
+
+label {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+input, select {
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+button.btn-primary {
+  margin-top: 1rem;
+  background-color: #0d9488;
+  color: #fff;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+button.btn-primary:hover {
+  background-color: #0f766e;
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.social-login {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.btn-google {
+  background-color: #db4437;
+  color: #fff;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-facebook {
+  background-color: #4267B2;
+  color: #fff;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+footer {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+footer a {
+  color: #0d9488;
+  text-decoration: none;
+}

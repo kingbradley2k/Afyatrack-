@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHV Dashboard - AfyaTrack</title>
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="logo">CHV Connect</div>
+    <nav>
+      <ul>
+        <li class="active">Dashboard</li>
+        <li>Household Visits</li>
+        <li>Submit Vitals</li>
+        <li>Map View</li>
+        <li>Reports</li>
+        <li>Profile</li>
+        <li>Settings</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <header>
+      <input type="text" placeholder="Search households, patients, or locations..." />
+      <div class="user-profile">
+        <span>Hi, Jane!</span>
+        <img src="assets/avatar.png" alt="User Avatar">
+      </div>
+    </header>
+
+    <!-- Metric Cards -->
+    <section class="metrics">
+      <div class="card">
+        <div class="card-icon"></div>
+        <div>
+          <h3>2937</h3>
+          <p>Total Households Visited</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon"></div>
+        <div>
+          <h3>5453</h3>
+          <p>Patients Screened</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon"></div>
+        <div>
+          <h3>170K</h3>
+          <p>New Cases Reported</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon"></div>
+        <div>
+          <h3>21</h3>
+          <p>Alerts Pending</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Household Visits Form -->
+    <section class="forms">
+      <div class="card">
+        <h3>Record Household Visit</h3>
+        <form>
+          <label>Household ID</label>
+          <input type="text" placeholder="HH-001">
+          <label>Head of Household Name</label>
+          <input type="text" placeholder="John Doe">
+          <label>Address</label>
+          <input type="text" placeholder="123 Main St">
+          <label>Date of Visit</label>
+          <input type="date">
+          <label>Visit Type</label>
+          <select>
+            <option>Routine</option>
+            <option>Follow-up</option>
+            <option>Emergency</option>
+          </select>
+          <label>Notes</label>
+          <textarea placeholder="Observations..."></textarea>
+          <button type="submit" class="btn-primary">Submit</button>
+        </form>
+      </div>
+
+      <!-- Patient Vitals Form -->
+      <div class="card">
+        <h3>Submit Patient Vitals</h3>
+        <form>
+          <label>Patient Name</label>
+          <input type="text" placeholder="Jane Doe">
+          <label>Age</label>
+          <input type="number">
+          <label>Gender</label>
+          <select>
+            <option>Female</option>
+            <option>Male</option>
+          </select>
+          <label>Temperature (°C)</label>
+          <input type="number" step="0.1">
+          <label>Pulse Rate</label>
+          <input type="number">
+          <label>Symptoms</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox"> Fever</label>
+            <label><input type="checkbox"> Cough</label>
+            <label><input type="checkbox"> Diarrhea</label>
+            <label><input type="checkbox"> Rash</label>
+            <label><input type="checkbox"> Other</label>
+          </div>
+          <label>Comments</label>
+          <textarea placeholder="Additional notes..."></textarea>
+          <button type="submit" class="btn-primary">Submit</button>
+        </form>
+      </div>
+    </section>
+    <!-- Household Visits Table -->
+<section class="card table-card">
+  <h3>Household Visits</h3>
+  <p>Recent households you visited</p>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Household ID</th>
+          <th>Head of Household</th>
+          <th>Address</th>
+          <th>Visit Type</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2025-11-10</td>
+          <td>HH-001</td>
+          <td>John Doe</td>
+          <td>123 Main St</td>
+          <td>Routine</td>
+          <td>
+            <button class="btn-edit">Edit</button>
+            <button class="btn-delete">Delete</button>
+          </td>
+        </tr>
+        <tr>
+          <td>2025-11-11</td>
+          <td>HH-002</td>
+          <td>Mary Jane</td>
+          <td>456 Elm St</td>
+          <td>Follow-up</td>
+          <td>
+            <button class="btn-edit">Edit</button>
+            <button class="btn-delete">Delete</button>
+          </td>
+        </tr>
+        <!-- Add more rows as needed -->
+      </tbody>
+    </table>
+  </div>
+</section>
+<!-- Recent Activity Table -->
+<section class="card table-card">
+  <h3>Recent Activity</h3>
+  <p>Patient screenings and actions</p>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Patient Name</th>
+          <th>Condition</th>
+          <th>Action Taken</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2025-11-12</td>
+          <td>Jane Doe</td>
+          <td>Fever</td>
+          <td>Referred to clinic</td>
+          <td>Pending</td>
+        </tr>
+        <tr>
+          <td>2025-11-12</td>
+          <td>Michael Otieno</td>
+          <td>Cough</td>
+          <td>Follow-up visit</td>
+          <td>Completed</td>
+        </tr>
+        <!-- Add more rows as needed -->
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+    <!-- Map View -->
+    <section class="card map-card">
+      <h3>Health Trends in Your Area</h3>
+      <p>Click to zoom or filter by condition.</p>
+      <img src="assets/map-placeholder.png" alt="Map Placeholder">
+    </section>
+  </div>
+</body>
+</html>

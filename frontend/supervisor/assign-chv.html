@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Assign to CHV - Supervisor</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+  <main class="main-content">
+    <h2>Assign Households / Patients to CHV</h2>
+
+    <form id="assignForm">
+      <label>CHV (select)</label>
+      <select id="assign_chv">
+        <option value="">Loading CHVs...</option>
+      </select>
+
+      <label>Household (optional)</label>
+      <select id="assign_household">
+        <option value="">(select household)</option>
+      </select>
+
+      <label>Patient (optional)</label>
+      <select id="assign_patient">
+        <option value="">(select patient)</option>
+      </select>
+
+      <button type="submit">Assign</button>
+    </form>
+
+    <div id="assignResult"></div>
+  </main>
+
+  <script src="/js/supervisor.js"></script>
+</body>
+</html>

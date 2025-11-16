@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Register Household - Supervisor</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+  <main class="main-content">
+    <h2>Register Household</h2>
+    <form id="householdRegisterForm">
+      <label>Household Code</label>
+      <input id="household_code" placeholder="HH-001" />
+
+      <label>Head of Household</label>
+      <input id="head_of_household" placeholder="John Doe" />
+
+      <label>Address</label>
+      <input id="address" placeholder="Village / Street" />
+
+      <label>Notes</label>
+      <textarea id="household_notes"></textarea>
+
+      <button type="submit">Create Household</button>
+    </form>
+
+    <div id="result"></div>
+  </main>
+
+  <script src="/js/supervisor.js"></script>
+</body>
+</html>

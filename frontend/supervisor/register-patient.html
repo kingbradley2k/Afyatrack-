@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Register Patient - Supervisor</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main class="main-content">
+    <h2>Register Patient</h2>
+
+    <form id="patientRegisterForm">
+      <label>Patient Code (optional)</label>
+      <input id="patient_code" placeholder="PT-001" />
+
+      <label>Patient Name</label>
+      <input id="patient_name" placeholder="Jane Doe" required />
+
+      <label>Age</label>
+      <input id="patient_age" type="number" />
+
+      <label>Gender</label>
+      <select id="patient_gender">
+        <option value="">Select</option>
+        <option value="Female">Female</option>
+        <option value="Male">Male</option>
+      </select>
+
+      <label>Household</label>
+      <select id="patient_household">
+        <option value="">Loading households...</option>
+      </select>
+
+      <label>Notes</label>
+      <textarea id="patient_notes"></textarea>
+
+      <button type="submit">Create Patient</button>
+    </form>
+
+    <div id="resultPatient"></div>
+  </main>
+
+  <script src="/js/supervisor.js"></script>
+</body>
+</html>

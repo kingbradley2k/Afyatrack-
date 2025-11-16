@@ -9,25 +9,37 @@ const chvRoutes = require('./routes/chv');
 
 const app = express();
 
-// Middleware
-app.use(cors()); // Update origin in production
+// -------------------- MIDDLEWARE --------------------
+app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// 👇 Serve static files from frontend folder (added this line)
+// -------------------- STATIC FILES --------------------
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Routes
+// -------------------- API ROUTES --------------------
 app.use('/api/auth', authRoutes);
 app.use('/api/chv', chvRoutes);
+// server.js (add this near other app.use routes)
+const supervisorRoutes = require('./routes/supervisor');
+app.use('/api/supervisor', supervisorRoutes);
 
-// Basic health
-app.get('/', (req, res) => res.json({ ok: true }));
-
-// 👇 Optional: Explicit route for dashboard (add this if needed)
-app.get('/dashboard.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dashboard.html'));
+// -------------------- FRONTEND ROUTES --------------------
+// Home page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Backend running on ${PORT}`));
+// Dashboard page
+app.get('/dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dashboard.html'));
+});
 
+// -------------------- HEALTH CHECK --------------------
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date() });
+});
+
+// -------------------- START SERVER --------------------
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));

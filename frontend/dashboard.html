@@ -96,15 +96,12 @@
       <div class="card">
         <h3>Submit Patient Vitals</h3>
         <form id="vitalsForm">  <!-- ✅ Added ID -->
-          <label>Patient Name</label>
-          <input type="text" id="patientName" placeholder="Jane Doe">  <!-- ✅ Added ID -->
-          <label>Age</label>
-          <input type="number" id="age">  <!-- ✅ Added ID -->
-          <label>Gender</label>
-          <select id="gender">  <!-- ✅ Added ID -->
-            <option>Female</option>
-            <option>Male</option>
-          </select>
+          <label for="patientSelect">Patient</label>
+<select id="patientSelect" name="patientSelect">
+  <option value="">-- Select patient --</option>
+  <!-- populated dynamically -->
+</select>
+
           <label>Temperature (°C)</label>
           <input type="number" id="temperature" step="0.1">  <!-- ✅ Added ID -->
           <label>Pulse Rate</label>

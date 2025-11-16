@@ -7,6 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const SALT_ROUNDS = 10;
 
 module.exports = {
+  // REGISTER USER
   register: async (req, res) => {
     try {
       const { full_name, email, phone, password, role } = req.body;
@@ -16,17 +17,19 @@ module.exports = {
 
       const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
 
-      // Insert user
       const { data, error } = await supabase
         .from('users')
         .insert([{ full_name, email, phone, password_hash, role }])
-        .select('id,full_name,email,phone,role')
+        .select('id, full_name, email, phone, role')
         .single();
 
       if (error) return res.status(400).json({ error: error.message });
 
-      // Create token
-      const token = jwt.sign({ userId: data.id, role: data.role }, JWT_SECRET, { expiresIn: '7d' });
+      const token = jwt.sign(
+        { userId: data.id, role: data.role },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+      );
 
       res.json({ user: data, token });
     } catch (err) {
@@ -35,15 +38,17 @@ module.exports = {
     }
   },
 
+  // LOGIN USER
   login: async (req, res) => {
     try {
-      const { identifier, password } = req.body; // identifier can be email or phone
-      if (!identifier || !password) return res.status(400).json({ error: 'Identifier and password required' });
+      const { identifier, password } = req.body;
+      if (!identifier || !password) {
+        return res.status(400).json({ error: 'Identifier and password required' });
+      }
 
-      // Find user by email or phone
       const { data: users, error } = await supabase
         .from('users')
-        .select('id,full_name,email,phone,password_hash,role')
+        .select('id, full_name, email, phone, password_hash, role')
         .or(`email.eq.${identifier},phone.eq.${identifier}`)
         .limit(1);
 
@@ -54,12 +59,33 @@ module.exports = {
       const match = await bcrypt.compare(password, user.password_hash);
       if (!match) return res.status(401).json({ error: 'Invalid credentials' });
 
-      const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+      const token = jwt.sign(
+        { userId: user.id, role: user.role },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+      );
 
-      // Don't send password_hash back
       delete user.password_hash;
 
       res.json({ user, token });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Server error' });
+    }
+  },
+
+  // LIST CHVs
+  listChvs: async (req, res) => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, full_name, email, phone, role')
+        .eq('role', 'CHV')
+        .order('full_name', { ascending: true });
+
+      if (error) return res.status(400).json({ error: error.message });
+
+      res.json({ chvs: data });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Server error' });

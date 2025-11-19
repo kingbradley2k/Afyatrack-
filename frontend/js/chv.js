@@ -1,94 +1,47 @@
-// ================= HOUSEHOLD FORM =================
-const householdForm = document.getElementById("householdForm");
-
-if (householdForm) {
-  householdForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const data = {
-      household_id: document.getElementById("householdId").value.trim(),
-      head_of_household: document.getElementById("householdHead").value.trim(),
-      address: document.getElementById("address").value.trim(),
-      date_of_visit: document.getElementById("visitDate").value,
-      visit_type: document.getElementById("visitType").value,
-      notes: document.getElementById("notes").value.trim(),
-    };
-
-    if (!data.household_id || !data.head_of_household || !data.address) {
-      alert("Please fill in all required fields.");
-      return;
+// CHV-specific functionality
+class CHVService {
+    constructor() {
+        this.assignedHouseholds = [];
+        this.visits = [];
+        this.loadData();
     }
 
-    try {
-      const response = await fetch("http://localhost:4000/api/chv/household", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
-        },
-        body: JSON.stringify(data),
-      });
+    loadData() {
+        // Load mock data - replace with actual API calls
+        this.assignedHouseholds = [
+            { id: 1, name: 'Mwangi Family', location: 'Kibera', members: 4, lastVisit: '2024-01-15' },
+            { id: 2, name: 'Otieno Household', location: 'Mathare', members: 3, lastVisit: '2024-01-14' },
+            { id: 3, name: 'Kamau Residence', location: 'Kawangware', members: 5, lastVisit: '2024-01-13' }
+        ];
 
-      if (response.ok) {
-        alert("✅ Household visit recorded successfully!");
-        householdForm.reset();
-      } else {
-        const error = await response.json();
-        alert("❌ Failed: " + error.error);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("❌ Network/server error.");
+        this.visits = [
+            { id: 1, householdId: 1, date: '2024-01-15', symptoms: [], notes: 'Routine checkup' },
+            { id: 2, householdId: 2, date: '2024-01-14', symptoms: ['fever'], notes: 'Reported high fever' }
+        ];
     }
-  });
+
+    getHouseholds() {
+        return this.assignedHouseholds;
+    }
+
+    getVisits() {
+        return this.visits;
+    }
+
+    recordVisit(visitData) {
+        const newVisit = {
+            id: Date.now(),
+            ...visitData,
+            date: new Date().toISOString().split('T')[0]
+        };
+        this.visits.unshift(newVisit);
+        return newVisit;
+    }
+
+    getHouseholdVisits(householdId) {
+        return this.visits.filter(visit => visit.householdId === householdId);
+    }
 }
 
-// ================= VITALS FORM =================
-const vitalsForm = document.getElementById("vitalsForm");
-
-if (vitalsForm) {
-  vitalsForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const symptomCheckboxes = document.querySelectorAll("#symptoms input[type='checkbox']:checked");
-    const symptoms = Array.from(symptomCheckboxes).map(box => box.value);
-
-    const data = {
-      // use the selected patient's name
-      patient_name: document.getElementById("patientSelect").value,
-      age: document.getElementById("age")?.value || null,
-      gender: document.getElementById("gender")?.value || null,
-      temperature: document.getElementById("temperature").value,
-      pulse_rate: document.getElementById("pulse").value,
-      symptoms,
-      comments: document.getElementById("comments").value.trim(),
-    };
-
-    if (!data.patient_name) {
-      alert("Please select a patient.");
-      return;
-    }
-
-    try {
-      const response = await fetch("http://localhost:4000/api/chv/vitals", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        alert("✅ Patient vitals submitted successfully!");
-        vitalsForm.reset();
-      } else {
-        const error = await response.json();
-        alert("❌ Failed: " + error.error);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("❌ Network/server error.");
-    }
-  });
-}
+// Create global CHV service instance
+const chvService = new CHVService();

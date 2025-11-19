@@ -1,92 +1,193 @@
-// auth.js
-const API = "http://localhost:4000/api"; // adjust if backend runs on another port
-
-// ==================== REGISTER USER ====================
-async function registerUser(e) {
-  e.preventDefault();
-
-  // Collect data from form inputs
-  const full_name = document.getElementById("reg-name").value.trim();
-  const email = document.getElementById("reg-email").value.trim();
-  const password = document.getElementById("reg-password").value;
-  const confirmPassword = document.getElementById("reg-confirm-password").value;
-  const role = document.getElementById("reg-role").value;
-
-  // Validation
-  if (!full_name || !email || !password || !confirmPassword || !role) {
-    alert("⚠️ Please fill in all required fields.");
-    return;
-  }
-
-  if (password !== confirmPassword) {
-    alert("⚠️ Passwords do not match.");
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ full_name, email, password, role }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      // Store token + user details locally
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      alert("✅ Registration successful!");
-      window.location.href = "/dashboard.html";
-    } else {
-      alert(`❌ ${data.error || "Registration failed."}`);
+// Auth Service with Registration
+class AuthService {
+    constructor() {
+        this.currentUser = null;
+        this.isAuthenticated = false;
+        this.userRole = null;
+        this.users = this.loadUsersFromStorage();
+        this.checkAuthStatus();
     }
-  } catch (err) {
-    console.error("Error registering user:", err);
-    alert("❌ Server or network error. Please try again.");
-  }
+
+    loadUsersFromStorage() {
+        const users = localStorage.getItem('afyatrack_users');
+        if (users) {
+            return JSON.parse(users);
+        }
+        
+        // Default users for demo - Only predefined System Admin
+        return [
+            {
+                id: 1,
+                name: 'System Administrator',
+                email: 'admin@afyatrack.com',
+                password: 'Admin@2024',
+                role: 'admin',
+                location: 'National Level',
+                permissions: ['all'],
+                registeredAt: new Date().toISOString(),
+                isPredefined: true
+            }
+        ];
+    }
+
+    saveUsersToStorage() {
+        localStorage.setItem('afyatrack_users', JSON.stringify(this.users));
+    }
+
+    checkAuthStatus() {
+        const userData = localStorage.getItem('afyatrack_user');
+        const token = localStorage.getItem('afyatrack_token');
+        
+        if (userData && token) {
+            try {
+                this.currentUser = JSON.parse(userData);
+                this.userRole = this.currentUser.role;
+                this.isAuthenticated = true;
+            } catch (error) {
+                this.logout();
+            }
+        }
+    }
+
+    async register(userData) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                // Validate required fields
+                if (!userData.name || !userData.email || !userData.password || !userData.role) {
+                    reject(new Error('All fields are required'));
+                    return;
+                }
+
+                // Check if email already exists
+                const existingUser = this.users.find(user => user.email === userData.email);
+                if (existingUser) {
+                    reject(new Error('Email already registered'));
+                    return;
+                }
+
+                // Validate password strength
+                if (userData.password.length < 6) {
+                    reject(new Error('Password must be at least 6 characters long'));
+                    return;
+                }
+
+                // Create new user
+                const newUser = {
+                    id: Date.now(),
+                    name: userData.name,
+                    email: userData.email,
+                    password: userData.password,
+                    role: userData.role,
+                    location: userData.location || 'Not specified',
+                    permissions: this.getDefaultPermissions(userData.role),
+                    registeredAt: new Date().toISOString(),
+                    isPredefined: false
+                };
+
+                this.users.push(newUser);
+                this.saveUsersToStorage();
+
+                // Auto-login after registration
+                this.currentUser = { ...newUser };
+                delete this.currentUser.password;
+                this.userRole = newUser.role;
+                this.isAuthenticated = true;
+                
+                localStorage.setItem('afyatrack_user', JSON.stringify(this.currentUser));
+                localStorage.setItem('afyatrack_token', 'mock_jwt_token_' + Date.now());
+
+                resolve(this.currentUser);
+            }, 1000);
+        });
+    }
+
+    async login(email, password) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (!email || !password) {
+                    reject(new Error('Email and password are required'));
+                    return;
+                }
+
+                // Find user by email
+                const user = this.users.find(u => u.email === email);
+                if (!user) {
+                    reject(new Error('Invalid email or password'));
+                    return;
+                }
+
+                // Check password
+                if (user.password !== password) {
+                    reject(new Error('Invalid email or password'));
+                    return;
+                }
+
+                // Login successful
+                this.currentUser = { ...user };
+                delete this.currentUser.password;
+                this.userRole = user.role;
+                this.isAuthenticated = true;
+                
+                localStorage.setItem('afyatrack_user', JSON.stringify(this.currentUser));
+                localStorage.setItem('afyatrack_token', 'mock_jwt_token_' + Date.now());
+
+                resolve(this.currentUser);
+            }, 1000);
+        });
+    }
+
+    getDefaultPermissions(role) {
+        switch(role) {
+            case 'admin':
+                return ['all'];
+            case 'supervisor':
+                return ['manage_chvs', 'view_reports', 'register_households'];
+            case 'chv':
+                return ['record_visits', 'view_households', 'report_symptoms'];
+            default:
+                return [];
+        }
+    }
+
+    logout() {
+        this.currentUser = null;
+        this.userRole = null;
+        this.isAuthenticated = false;
+        localStorage.removeItem('afyatrack_user');
+        localStorage.removeItem('afyatrack_token');
+    }
+
+    getCurrentUser() {
+        return this.currentUser;
+    }
+
+    isLoggedIn() {
+        return this.isAuthenticated;
+    }
+
+    getUserRole() {
+        return this.userRole;
+    }
+
+    hasPermission(permission) {
+        if (!this.currentUser) return false;
+        if (this.userRole === 'admin') return true;
+        return this.currentUser.permissions?.includes(permission) || false;
+    }
+
+    // For demo purposes - get all users (admin only)
+    getAllUsers() {
+        return this.users.map(user => {
+            const { password, ...userWithoutPassword } = user;
+            return userWithoutPassword;
+        });
+    }
+
+    // Check if registration is allowed for role
+    isRegistrationAllowed(role) {
+        return role !== 'admin'; // Only Supervisor and CHV can register
+    }
 }
 
-// ==================== LOGIN USER ====================
-async function loginUser(e) {
-  e.preventDefault();
-
-  const identifier = document.getElementById("login-email").value.trim();
-  const password = document.getElementById("login-password").value;
-
-  if (!identifier || !password) {
-    alert("⚠️ Please fill in both email/phone and password.");
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ identifier, password }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      alert("✅ Login successful!");
-      window.location.href = "/dashboard.html";
-    } else {
-      alert(`❌ ${data.error || "Login failed. Check your credentials."}`);
-    }
-  } catch (err) {
-    console.error("Error logging in:", err);
-    alert("❌ Server or network error. Please try again.");
-  }
-}
-
-// ==================== EVENT LISTENERS ====================
-document.addEventListener("DOMContentLoaded", () => {
-  const registerForm = document.querySelector("#register");
-  const loginForm = document.querySelector("#login");
-
-  if (registerForm) registerForm.addEventListener("submit", registerUser);
-  if (loginForm) loginForm.addEventListener("submit", loginUser);
-});
+// Create global auth instance
+const auth = new AuthService();

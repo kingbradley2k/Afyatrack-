@@ -4,26 +4,58 @@ class SupervisorService {
         this.chvs = [];
         this.households = [];
         this.assignments = [];
+        this.patients = [];
         this.loadData();
     }
 
-    loadData() {
-        // Load mock data - replace with actual API calls
-        this.chvs = [
-            { id: 1, name: 'Jane Muthoni', email: 'jane@chv.afyatrack', location: 'Kibera', households: 15 },
-            { id: 2, name: 'John Kamau', email: 'john@chv.afyatrack', location: 'Mathare', households: 12 },
-            { id: 3, name: 'Mary Achieng', email: 'mary@chv.afyatrack', location: 'Kawangware', households: 18 }
-        ];
+    async loadData() {
+        try {
+            // Fetch CHVs
+            const chvResponse = await fetch('/api/supervisor/chvs', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (chvResponse.ok) {
+                const chvData = await chvResponse.json();
+                this.chvs = chvData.chvs || [];
+            }
 
-        this.households = [
-            { id: 1, name: 'Mwangi Family', location: 'Kibera', members: 4, chvId: 1 },
-            { id: 2, name: 'Otieno Household', location: 'Mathare', members: 3, chvId: 2 }
-        ];
+            // Fetch households
+            const householdResponse = await fetch('/api/supervisor/households', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (householdResponse.ok) {
+                const householdData = await householdResponse.json();
+                this.households = householdData.households || [];
+            }
 
-        this.assignments = [
-            { id: 1, chvId: 1, householdId: 1, assignedDate: '2024-01-10' },
-            { id: 2, chvId: 2, householdId: 2, assignedDate: '2024-01-11' }
-        ];
+            // Fetch assignments
+            const assignmentResponse = await fetch('/api/supervisor/assignments', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (assignmentResponse.ok) {
+                const assignmentData = await assignmentResponse.json();
+                this.assignments = assignmentData.household_assignments || [];
+            }
+
+            // Fetch patients
+            const patientResponse = await fetch('/api/supervisor/patients', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (patientResponse.ok) {
+                const patientData = await patientResponse.json();
+                this.patients = patientData.patients || [];
+            }
+        } catch (error) {
+            console.error('Error loading data:', error);
+        }
     }
 
     getCHVs() {
@@ -38,24 +70,80 @@ class SupervisorService {
         return this.assignments;
     }
 
-    assignCHV(chvId, householdId) {
-        const assignment = {
-            id: Date.now(),
-            chvId: parseInt(chvId),
-            householdId: parseInt(householdId),
-            assignedDate: new Date().toISOString().split('T')[0]
-        };
-        this.assignments.push(assignment);
-        return assignment;
+    getPatients() {
+        return this.patients;
     }
 
-    registerHousehold(householdData) {
-        const household = {
-            id: Date.now(),
-            ...householdData
-        };
-        this.households.push(household);
-        return household;
+    async assignCHV(chvId, householdId) {
+        try {
+            const response = await fetch('/api/supervisor/assign/household', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ chv_id: chvId, household_id: householdId })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                // Reload data to reflect changes
+                await this.loadData();
+                return data.assignment;
+            } else {
+                throw new Error('Failed to assign CHV');
+            }
+        } catch (error) {
+            console.error('Error assigning CHV:', error);
+            throw error;
+        }
+    }
+
+    async assignPatient(chvId, patientId) {
+        try {
+            const response = await fetch('/api/supervisor/assign/patient', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ chv_id: chvId, patient_id: patientId })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                // Reload data to reflect changes
+                await this.loadData();
+                return data.assignment;
+            } else {
+                throw new Error('Failed to assign patient');
+            }
+        } catch (error) {
+            console.error('Error assigning patient:', error);
+            throw error;
+        }
+    }
+
+    async registerHousehold(householdData) {
+        try {
+            const response = await fetch('/api/supervisor/households', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(householdData)
+            });
+            if (response.ok) {
+                const data = await response.json();
+                // Reload data to reflect changes
+                await this.loadData();
+                return data.household;
+            } else {
+                throw new Error('Failed to register household');
+            }
+        } catch (error) {
+            console.error('Error registering household:', error);
+            throw error;
+        }
     }
 }
 

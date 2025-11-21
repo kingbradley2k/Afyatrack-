@@ -18,5 +18,6 @@ router.post('/assign/patient', authMiddleware, supervisorController.assignPatien
 router.get('/assignments', authMiddleware, supervisorController.listAssignments);
 router.get('/chv/:chvId/households', authMiddleware, supervisorController.listHouseholdsForChv);
 router.get('/chv/:chvId/patients', authMiddleware, supervisorController.listPatientsForChv);
+router.get('/chvs', authMiddleware, supervisorController.listCHVs);
 
 module.exports = router;
